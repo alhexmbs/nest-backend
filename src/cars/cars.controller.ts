@@ -1,12 +1,17 @@
-import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { CarsService } from './cars.service';
-
-interface Car {
-  id: number;
-  brand: string;
-  model: string;
-  year: number;
-}
+import type { ICar } from './interfaces/car.interface';
+import { CreateCarDto } from './dto/create-car.dto';
 
 @Controller('cars')
 export class CarsController {
@@ -16,15 +21,33 @@ export class CarsController {
 
   // GET /cars
   @Get()
-  getAllCars(): Car[] {
+  getAllCars(): ICar[] {
     return this.carsService.findAll();
   }
 
   // GET /cars/:id
   @Get(':id')
-  // Using ParseIntPipe to automatically convert 'id' to a number and handle invalid input
+  // Using ParseUUIDPipe to automatically convert 'id' to a UUID and handle invalid input
   // Specify return type as Car, as NotFoundException will handle cases where it's not found
-  getCarById(@Param('id', ParseIntPipe) id: number): Car {
+  getCarById(@Param('id', ParseUUIDPipe) id: string): ICar {
     return this.carsService.findOne(id);
+  }
+
+  @Post()
+  createCar(@Body() createCarDto: CreateCarDto): ICar {
+    return this.carsService.createCar(createCarDto);
+  }
+
+  @Patch(':id')
+  updateCar(@Param('id', ParseIntPipe) id: number, @Body() body: any) {
+    return body;
+  }
+
+  @Delete(':id')
+  deleteCar(@Param('id', ParseIntPipe) id: number) {
+    return {
+      method: 'delete',
+      id,
+    };
   }
 }

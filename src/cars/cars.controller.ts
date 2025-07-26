@@ -12,11 +12,11 @@ import {
 import { CarsService } from './cars.service';
 import type { ICar } from './interfaces/car.interface';
 import { CreateCarDto } from './dto/create-car.dto';
+import { UpdateCarDto } from './dto/update-car.dto';
 
 @Controller('cars')
 export class CarsController {
-  // Initialization of the cars array
-
+  // Initialization of the car array
   constructor(private readonly carsService: CarsService) {}
 
   // GET /cars
@@ -27,9 +27,8 @@ export class CarsController {
 
   // GET /cars/:id
   @Get(':id')
-  // Using ParseUUIDPipe to automatically convert 'id' to a UUID and handle invalid input
-  // Specify return type as Car, as NotFoundException will handle cases where it's not found
   getCarById(@Param('id', ParseUUIDPipe) id: string): ICar {
+    // Using ParseUUIDPipe to automatically convert 'id' to a UUID and handle invalid input
     return this.carsService.findOne(id);
   }
 
@@ -39,8 +38,11 @@ export class CarsController {
   }
 
   @Patch(':id')
-  updateCar(@Param('id', ParseIntPipe) id: number, @Body() body: any) {
-    return body;
+  updateCar(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateCarDto: UpdateCarDto,
+  ): ICar {
+    return this.carsService.updateCar(id, updateCarDto);
   }
 
   @Delete(':id')
